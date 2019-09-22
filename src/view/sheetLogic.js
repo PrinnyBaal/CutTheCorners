@@ -18,11 +18,12 @@ let setUp={
 let drawImg={
   urlToCrop:function(newURL){
     let resultHTML="";
-    resultHTML+=`<canvas class="canvasResult" id="canvas0" width="500" height="380"></canvas>`;
+    resultHTML+=`<canvas class="canvasResult" id="canvas0" width="500" height="380"></canvas>
+                  <canvas class="canvasResult" id="secondaryCanvas0" width="250" height="190"></canvas>`;
 
 
     $("#resultBox").html(resultHTML);
-    drawImg.drawToCanvas($("#canvas0")[0], newURL);
+    drawImg.drawToCanvas($("#canvas0")[0], newURL, 0);
   },
   filesToCrop:function(event){
     console.log(event.target.files);
@@ -32,18 +33,19 @@ let drawImg={
 
     Array.from(fileList).forEach((file, index)=>{
       resultHTML+=`<canvas class="canvasResult" id="canvas${index}" width="500" height="380"></canvas>`;
+      resultHTML+=`<canvas class="canvasResult" id="secondaryCanvas${index}" width="250" height="190"></canvas>`;
     });
 
     $("#resultBox").html(resultHTML);
 
     Array.from(fileList).forEach((file, index)=>{
       let fileURL=URL.createObjectURL(event.target.files[index]);
-      drawImg.drawToCanvas($(`#canvas${index}`)[0], fileURL);
+      drawImg.drawToCanvas($(`#canvas${index}`)[0], fileURL, index);
     });
 
 
   },
-  drawToCanvas:function(canvas, imgURL){
+  drawToCanvas:function(canvas, imgURL, index){
     // http://jsfiddle.net/bozdoz/TB9rX/
 
     let promisedItems=[
@@ -51,7 +53,7 @@ let drawImg={
         const img = new Image();
         img.onload = () => resolve(img);
         img.onerror = () => resolve(false);
-
+        img.setAttribute('crossOrigin', 'anonymous');
         img.src = imgURL;
       })
    ];
@@ -85,8 +87,7 @@ let drawImg={
         }
 
         ctx.globalCompositeOperation = 'destination-in';
-        console.log(canvas.width);
-        console.log(canvas.height);
+
         if (data.settings.cropType=="skill"){
           // var path = [0, 0, 100,  0, 100 , 79, 68, 100, 32, 100, 0, 79];
           let path=[0, 0, 100, 0, 100, 80, 60, 98, 40, 98, 0, 80];
@@ -110,12 +111,52 @@ let drawImg={
           ctx.fill();
         }
 
-
+        let dataURL=canvas.toDataURL();
+        drawImg.secondaryCrop(dataURL, index);
         URL.revokeObjectURL(imgURL)
 
     }).catch(function(err) {
       console.log(err); // some coding error in handling happened
     });;
 
+  },
+  secondaryCrop:function(dataURL, index){
+
+    let promisedItems=[
+      new Promise(function (resolve, reject){
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(false);
+        img.setAttribute('crossOrigin', 'anonymous');
+        img.src = dataURL;
+      })
+   ];
+
+   Promise.all([...promisedItems]).then(
+     function(img){
+
+    let canvas=$(`#secondaryCanvas${index}`)[0];
+    let ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    canvas.crossOrigin = "Anonymous";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+
+    //load images THEN draw images
+
+    for (let i=0; i<img.length; i++){
+      if (img[i]){
+
+        ctx.drawImage(img[i], 0, 0, img[i].width,    img[i].height,     // source rectangle
+               0, 0, canvas.width, canvas.height); // destination rectangle
+      }
+
+    }
+
+
+}).catch(function(err) {
+  console.log(err); // some coding error in handling happened
+});;
   }
 }
