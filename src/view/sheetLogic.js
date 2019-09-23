@@ -18,8 +18,14 @@ let setUp={
 let drawImg={
   urlToCrop:function(newURL){
     let resultHTML="";
-    resultHTML+=`<canvas class="canvasResult" id="canvas0" width="500" height="380"></canvas>
-                  <canvas class="canvasResult" id="secondaryCanvas0" width="250" height="190"></canvas>`;
+    // if (cropType=="skill"){
+    //
+    // }
+    // else{
+      resultHTML+=`<canvas class="canvasResult" id="canvas0" width="500" height="380"></canvas>
+                    <canvas class="canvasResult" id="secondaryCanvas0" width="250" height="190"></canvas>`;
+    // }
+
 
 
     $("#resultBox").html(resultHTML);
@@ -29,12 +35,21 @@ let drawImg={
     console.log(event.target.files);
     let fileList=event.target.files;
     let resultHTML="";
+    let cropType=data.settings.cropType;
 
+    // if (cropType=="skill"){
+    //   Array.from(fileList).forEach((file, index)=>{
+    //     resultHTML+=`<canvas class="canvasResult" id="canvas${index}" width="490" height="360"></canvas>`;
+    //     resultHTML+=`<canvas class="canvasResult" id="secondaryCanvas${index}" width="250" height="190"></canvas>`;
+    //   });
+    // }
+    // else{
+      Array.from(fileList).forEach((file, index)=>{
+        resultHTML+=`<canvas class="canvasResult" id="canvas${index}" width="500" height="380"></canvas>`;
+        resultHTML+=`<canvas class="canvasResult" id="secondaryCanvas${index}" width="250" height="190"></canvas>`;
+      });
+    // }
 
-    Array.from(fileList).forEach((file, index)=>{
-      resultHTML+=`<canvas class="canvasResult" id="canvas${index}" width="500" height="380"></canvas>`;
-      resultHTML+=`<canvas class="canvasResult" id="secondaryCanvas${index}" width="250" height="190"></canvas>`;
-    });
 
     $("#resultBox").html(resultHTML);
 
@@ -57,6 +72,7 @@ let drawImg={
         img.src = imgURL;
       })
    ];
+   let cropType=data.settings.cropType;
 
 
 
@@ -68,6 +84,7 @@ let drawImg={
         console.log(canvas);
         let ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let path;
 
         canvas.crossOrigin = "Anonymous";
         ctx.textBaseline = "middle";
@@ -88,9 +105,9 @@ let drawImg={
 
         ctx.globalCompositeOperation = 'destination-in';
 
-        if (data.settings.cropType=="skill"){
+        if (data.settings.cropType=="attack"){
           // var path = [0, 0, 100,  0, 100 , 79, 68, 100, 32, 100, 0, 79];
-          let path=[0, 0, 100, 0, 100, 80, 60, 98, 40, 98, 0, 80];
+          path=[0, 0, 100, 0, 100, 80, 60, 98, 40, 98, 0, 80];
 
           var w = ctx.canvas.width,
               h = ctx.canvas.height;
@@ -109,6 +126,21 @@ let drawImg={
           ctx.beginPath();
           ctx.ellipse(250, 142, 259, 229, 0, 0, Math.PI*2);
           ctx.fill();
+        }
+
+        else if(data.settings.cropType=="skill"){
+          path=[1, 0, 98, 0, 98, 96, 1, 96];
+
+          var w = ctx.canvas.width,
+              h = ctx.canvas.height;
+
+              ctx.beginPath();
+              ctx.moveTo(path[0] * w / 100, path[1] * h / 100);
+              for(var i = 2; i < path.length; i+=2) {
+                  ctx.lineTo(path[i] * w / 100, path[i+1] * h / 100);
+              }
+              ctx.closePath();
+              ctx.fill();
         }
 
         let dataURL=canvas.toDataURL();

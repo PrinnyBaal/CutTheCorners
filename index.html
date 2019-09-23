@@ -24,8 +24,12 @@
 
   <div id="submissionBox" style="margin-top:10vh">
     <div id="cropSelect">
-      <input onclick="setUp.croptypeChange(event.target.value)" type="radio" id="skill" name="cropType" value="skill"
+      <input onclick="setUp.croptypeChange(event.target.value)" type="radio" id="attack" name="cropType" value="attack"
          checked>
+      <label for="attack">Attack</label>
+
+      <input onclick="setUp.croptypeChange(event.target.value)" type="radio" id="skill" name="cropType" value="skill"
+        >
       <label for="skill">Skill</label>
 
       <input onclick="setUp.croptypeChange(event.target.value)" type="radio" id="power" name="cropType" value="power"
@@ -40,6 +44,6 @@
        onchange="drawImg.filesToCrop(event)" multiple></div>
 
   </div>
-  <div id="resultBox" style="margin-top:25px"></div>
+  <div id="resultBox" style="margin-top:25px; align-items:center;"></div>
 
 </body>

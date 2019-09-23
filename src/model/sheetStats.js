@@ -9,7 +9,7 @@
 // }
 let data={
   settings:{
-    cropType:"skill",
+    cropType:"attack",
   }
 }
 
